@@ -2,6 +2,7 @@ package gssapi
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/KrakenTech-LLC/gokrb5/v8/client"
 	"github.com/KrakenTech-LLC/gokrb5/v8/config"
@@ -62,7 +63,7 @@ func NewClientWithPassword(username, realm, password string, krb5confPath string
 }
 
 // NewClientFromCCache creates a new client from a populated client cache.
-func NewClientFromCCache(ccachePath, krb5confPath string, settings ...func(*client.Settings)) (*Client, error) {
+func NewClientFromCCache(ccachePath, krb5confPath, spn string, settings ...func(*client.Settings)) (*Client, error) {
 	krb5conf, err := config.Load(krb5confPath)
 	if err != nil {
 		return nil, err
@@ -73,7 +74,7 @@ func NewClientFromCCache(ccachePath, krb5confPath string, settings ...func(*clie
 		return nil, err
 	}
 
-	client, err := client.NewFromCCache(ccache, krb5conf, settings...)
+	client, err := client.NewFromCCache(ccache, strings.Split(spn, "/"), krb5conf, settings...)
 	if err != nil {
 		return nil, err
 	}
